@@ -1,9 +1,11 @@
 1. init gitolite       @ master
 2. create empty repo   @ master
-3. add repo to cluster @ master
-4. add slave pub key   @ master
+3. add user            @ master
+4. add repo to cluster @ master
+5. add slave pub key   @ master
 
-5. init gitolite    @ slave
-6. mirror all repo  @ slave
-7. elect new master @ slave
-8. prevent getting older repo data @slave
+6. init gitolite         @ slave
+7. mirror/pull all repos @ slave
+
+8?. elect new master @ slave
+9?. prevent getting older repo data @slave

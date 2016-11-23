@@ -1,11 +1,13 @@
 1. init gitolite       @ master
 2. create empty repo   @ master
-3. add user            @ master
-4. add repo to cluster @ master
+3. add gitolite user   @ master
+4. mark repo to backup @ master
+
 5. add slave pub key   @ master
 
 6. init gitolite         @ slave
 7. mirror/pull all repos @ slave
+8. scheduling            @ slave
 
-8?. elect new master @ slave
-9?. prevent getting older repo data @slave
+9?. elect new master @ slave
+10?. prevent getting older repo data @slave

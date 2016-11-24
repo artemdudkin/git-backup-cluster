@@ -20,6 +20,7 @@ if [ "$command" == "master" ]; then
 	user=$2; if [ -z $user ]; then user="git"; fi
 
 	~/git-backup-cluster/_install_gitolite $user
+	if [ $? != 0 ] ; then exit; fi
 	~/git-backup-cluster/_clone_self $user
 	exit
 fi

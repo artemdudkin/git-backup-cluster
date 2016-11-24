@@ -23,15 +23,23 @@ gbc <command> <params>
 
 Init of master node
 
+### master add repo "name" "path"
+
+Adds repo to cluster (copy and push). Name = name of repo. Path = path to repo files
+
 ### master add node "name" "pubkey"
 
 Adds node key at master node. Name = name of node (just for info). Pubkey = path to public key of node
+
+### master rm node "name"
 
 ### master add user "name" "pubkey" "permissions"
 
 Adds node user at master node. Name = name of user. Pubkey = path to public key of user. Permissions = RW|R
 
-### node install
+### master rm user "name"
+
+### slave install
 
 Init of slave node
 

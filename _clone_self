@@ -1,0 +1,40 @@
+#!/bin/bash
+#
+# Clone repo git-backup-cluster to local repo
+#
+# @1 = username
+#
+
+user_git_name=$1
+user_admin_name="$user_git_name-admin"
+user_admin_dir=$(eval echo "~$user_admin_name")
+
+#clone gitolite-admin repo @ admin user
+sudo -u $user_admin_name -H sh << EOF
+	cd $user_admin_dir/gitolite-admin
+
+	printf "\nrepo git-backup-cluster\n    RW = git-admin\n\n" >> conf/gitolite.conf
+
+	git config --global user.name "git-admin"
+	git add -A .
+	git commit -m "add repo git-backup-cluster"
+	git push origin master
+
+	cd ..
+	
+	git clone $user_git_name@localhost:git-backup-cluster
+EOF
+
+echo 'git-backup-cluster' > $(dirname $0)/cfg/repos
+
+cp -R $(dirname $0)/* "$user_admin_dir/git-backup-cluster"
+chown -R "$user_admin_name:$user_admin_name" "$user_admin_dir"
+
+#clone gitolite-admin repo @ admin user
+sudo -u $user_admin_name -H sh << EOF
+	cd $user_admin_dir/git-backup-cluster
+
+	git add -A .
+	git commit -m "initial commit"
+	git push origin master
+EOF

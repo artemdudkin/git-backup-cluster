@@ -1,0 +1,47 @@
+#!/bin/bash
+
+command=$1
+
+if [ "$command" == "clear" ]; then
+	if [ -z $2 ]; then printf "Removes ^M at files from windows\n\n  Usage: $0 clear <filename>\n\n"; exit; fi
+	#removes ^M at files from windows
+	sed -i -e 's/\r$//' "$1"
+	exit
+fi
+
+if [ "$command" == "install" ]; then
+	#create symlink to this file from ~/bin
+	mkdir -p ~/bin
+	ln -s "$(realpath $0)" ~/bin/gbc
+	exit
+fi
+
+if [ "$command" == "master" ]; then
+	user=$2; if [ -z $user ]; then user="git"; fi
+
+	~/git-backup-cluster/_install_gitolite $user
+	~/git-backup-cluster/_clone_self $user
+	exit
+fi
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+if [ -z "$command" ]; then
+	printf "\n  Usage: $0 <command> [<param1>] [<param2>] ...\n\n"
+	exit
+fi
+
+printf "\n  ERROR: Unknown command '$1'\n\n"
+exit
+

@@ -1,0 +1,65 @@
+#!/bin/bash
+#
+# Install gitolite for chosen user
+#
+# @1 = username
+#
+. $(dirname $0)/_helper
+
+
+OS=$(get_os_id)
+
+user_git_name=$1
+user_admin_name="$user_git_name-admin"
+
+#check os
+if [ ! "${OS}" == "centos" ] && [ ! "${OS}" == "ubuntu"  ] ; then 
+	echo "Untested OS '$OS' - please fix it at sources if you really want to proceed (I guess no)"
+else 
+	echo "OS '$OS' is ok"
+fi
+
+#check mandatory input params
+if [ -z "$1" ] ; then 
+	printf "\n\tUsage: $0 <user_name>\n\n"
+	exit -1
+fi
+
+user_exists_or_homedir_exists_will_cause_exit $user_git_name
+user_exists_or_homedir_exists_will_cause_exit $user_admin_name
+
+user_create $user_git_name
+user_create $user_admin_name
+
+user_admin_dir=$(eval echo "~$user_admin_name")
+sudo -u $user_admin_name -H sh << EOF
+	cd $user_admin_dir
+	ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
+EOF
+
+user_home_dir=$(eval echo "~$user_git_name")
+#copy pk key
+cp "$user_admin_dir/.ssh/id_rsa.pub" $user_home_dir
+#rename pub key to git-admin.pub
+mv "$user_home_dir/id_rsa.pub" "$user_home_dir/git-admin.pub"
+pk=$(ls "$user_home_dir" | head -n 1)
+#ajust permissions
+chown -R "$user_name:$user_name" "$user_home_dir"
+
+#download gitolite @ repo user
+sudo -u $user_git_name -H sh << EOF
+	cd $user_home_dir
+	mkdir ~/bin
+	git clone git://github.com/sitaramc/gitolite
+	if [ $? != 0 ] ; then exit; fi
+	gitolite/install -ln ~/bin
+	if [ $? != 0 ] ; then exit; fi
+	bin/gitolite setup -pk "$pk"
+	rm -f "$pk"
+EOF
+
+#clone gitolite-admin repo @ admin user
+sudo -u $user_admin_name -H sh << EOF
+	cd $user_admin_dir
+	git clone $user_git_name@localhost:gitolite-admin
+EOF

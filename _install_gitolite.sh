@@ -10,7 +10,7 @@ function user_exists() {
 #@2 = prop name
 #@3 = key-value delimiter
 #@echo prop value
-function read_prop_from_file_or_string() { 
+function read_prop_from_file() { 
 	local delimiter=$3
 
 	if [ -z $delimiter ] ; then delimiter="="; fi
@@ -32,10 +32,10 @@ function read_prop_from_file_or_string() {
 }
 #@echo operation system id
 function get_os_id() { 
-	local id=$(read_prop_from_file_or_string "/etc/os-release" "ID")
+	local id=$(read_prop_from_file "/etc/os-release" "ID")
 	if [ -z "$id" ]; then
 		lsb_release -a > ./.tmp
-		id=$(read_prop_from_file_or_string "./.tmp" "Distributor ID" ":")
+		id=$(read_prop_from_file "./.tmp" "Distributor ID" ":")
 		rm -f ./.tmp
 	fi
 	echo $id

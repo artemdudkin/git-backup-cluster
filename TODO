@@ -1,4 +1,4 @@
-1. init gitolite       @ master
+----. init gitolite       @ master
 2. create empty repo   @ master
 3. add gitolite user   @ master
 4. mark repo to backup @ master

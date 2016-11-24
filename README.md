@@ -23,13 +23,13 @@ gbc <command> <params>
 
 Init of master node
 
-### master add node "name" "keypath"
+### master add node "name" "pubkey"
 
-Adds node key at master node. Name = name of node (just for info). Keypath = path to RSA public key of node
+Adds node key at master node. Name = name of node (just for info). Pubkey = path to public key of node
 
-### master add user "name" "keypath" "permissions"
+### master add user "name" "pubkey" "permissions"
 
-Adds node user at master node. Name = name of user. Keypath = path to RSA public key of user. Permissions = RW|R
+Adds node user at master node. Name = name of user. Pubkey = path to public key of user. Permissions = RW|R
 
 ### node install
 

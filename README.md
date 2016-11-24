@@ -17,7 +17,7 @@ Commands can be run just like
 gbc <command> <params>
 ```
 
-## Commands 
+## Master Commands 
 
 ### master install
 
@@ -35,13 +35,17 @@ Adds node key at master node. Name = name of node (just for info). Pubkey = path
 
 ### master add user "name" "pubkey" "permissions"
 
-Adds node user at master node. Name = name of user. Pubkey = path to public key of user. Permissions = RW|R
+Adds node user at master node. Name = name of user. Pubkey = path to public key of user. Permissions = RW|R.
 
 ### master rm user "name"
 
-### slave install
+Delete user, obviously.
 
-Init of slave node
+## Slave Commands 
+
+### slave install "ip"
+
+Init of slave node. IP = ip of master.
 
 ## License
 

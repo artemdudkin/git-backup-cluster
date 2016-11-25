@@ -18,8 +18,27 @@ _!!!Under strong construction!!!_
 
 Commands can be run just like 
 ```sh
-gbc master|slave <command> <params>
+gbc gitolite|master|slave <command> <params>
 ```
+
+## Gitolite Commands 
+
+### install "username"
+
+Create git user (wher repo files) named "username", create git-admin user (named "username-admin") and install gitolite 
+
+### add repo "name" "path"
+
+Add repo (copy and push). Name = name of repo. Path = path to repo files
+
+### add user "name" "pubkey" 
+
+Add user (with no permissions to any repo). Name = name of user. Pubkey = path to public key of user.
+
+### grant "repo" "user" "perm" 
+
+Grant some rights for user at specified repo. Repo = name of repo. User = name of user. Perm = RW|R
+
 
 ## Master Commands 
 
@@ -27,23 +46,13 @@ gbc master|slave <command> <params>
 
 Init of master node
 
-### add repo "name" "path"
+### add repo "name"
 
-Adds repo to cluster (copy and push). Name = name of repo. Path = path to repo files
+Adds existing repo to cluster. Name = name of repo.
 
-### add node "name" "pubkey"
+### add node "user"
 
-Adds node key at master node. Name = name of node (just for info). Pubkey = path to public key of node
-
-### rm node "name"
-
-### add user "name" "pubkey" "permissions"
-
-Adds node user at master node. Name = name of user. Pubkey = path to public key of user. Permissions = RW|R.
-
-### rm user "name"
-
-Delete user, obviously.
+Existing user becomes node - that means user grant R access to repo at cluster (to allow copy it)
 
 ## Slave Commands 
 

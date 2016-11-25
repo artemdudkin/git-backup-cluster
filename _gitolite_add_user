@@ -1,0 +1,37 @@
+#!/bin/bash
+#
+#
+#
+. $(dirname $0)/_helper #import functions
+
+user=$1 
+keypath=$2 
+
+#get git user name
+git_user=$(get_git_user_name)
+git_user_admin="$git_user-admin"
+git_user_admin_home_dir=$(eval echo "~$git_user_admin")
+
+#check input params
+if [ -z $user ] || [ -z $keypath ]; then printf "\n  Usage: $0 gitolite add user <name> <keypath>\n\n"; exit -1; fi
+if [ -z "${git_user// }" ]; then echo "ERROR: Cannot find git user name - there is no gbc.cfg, maybe"; exit -1; fi
+if [ ! -e $keypath ]; then echo "ERROR: file '$keypath' does not exists"; exit; fi
+
+#check if user unique
+users=$(ls "$git_user_admin_home_dir/gitolite-admin/keydir/")
+users=${users//\.pub/}
+if [[ $users == *$user* ]]; then echo "User '$user' already exists"; exit -1; fi
+
+#copy keyfile to gitolite
+cp "$keypath" "$git_user_admin_home_dir/gitolite-admin/keydir/$user.pub"
+#ajust permissions
+chown "$git_user_admin":"$git_user_admin" "$git_user_admin_home_dir/gitolite-admin/keydir/$user.pub"
+
+#push to gitolite-admin repo @ admin user
+sudo -u $git_user_admin -H sh << EOF
+	cd $git_user_admin_home_dir/gitolite-admin
+	
+	git add -A .
+	git commit -m "add user $user"
+	git push origin master
+EOF

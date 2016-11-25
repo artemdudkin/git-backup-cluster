@@ -12,7 +12,7 @@ OS=$(get_os_id)
 user_git_name=$1
 user_admin_name="$user_git_name-admin"
 
-echo "user=\"$user_git_name\"" > "$(dirname $0)/../gbc.cfg"
+echo "git_user=\"$user_git_name\"" > "$(dirname $0)/../gbc.cfg"
 
 #check os
 if [ ! "${OS}" == "centos" ] && [ ! "${OS}" == "ubuntu"  ] ; then 
@@ -23,7 +23,7 @@ fi
 
 #check mandatory input params
 if [ -z "$1" ] ; then 
-	printf "\n\tUsage: $0 <user_name>\n\n"
+	printf "\n\tUsage: $0 gitolite install <user_name>\n\n"
 	exit -1
 fi
 

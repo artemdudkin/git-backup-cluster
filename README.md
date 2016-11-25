@@ -31,32 +31,32 @@ Create git user named "username" (i.e. user to store repos), create git-admin us
 
 Add user (with no permissions to any repo). Name = name of user. Pubkey = path to public key of user.
 
-### add repo "name" "path"
+### ~~add repo "name" "path"~~
 
 Add repo (copy and push). Name = name of repo. Path = path to repo files
 
-### grant "repo" "user" "perm" 
+### ~~grant "repo" "user" "perm"~~
 
 Grant some rights for user at specified repo. Repo = name of repo. User = name of user. Perm = RW|R
 
 
 ## Master Commands 
 
-### init
+### ~~init~~
 
 Init of master node
 
-### add repo "name"
+### ~~add repo "name"~~
 
 Adds existing repo to cluster. Name = name of repo.
 
-### add node "user"
+### ~~add node "user"~~
 
 Existing user becomes node - that means user grant R access to repo at cluster (to allow copy it)
 
 ## Slave Commands 
 
-### init "ip"
+### ~~init "ip"~~
 
 Init of slave node. IP = ip of master.
 

@@ -6,7 +6,7 @@ _I have some set of git repos with my private projects. I changed VPS providers 
 
 _Now I have several chip VPS with backup of my repos, and I can add new slave just in one minute. Wow!_
 
-_!!!Under strong construction!!!_
+***!!!Under construction!!!***
 
 ## Instalation
 

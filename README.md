@@ -35,7 +35,7 @@ Add user (with no permissions to any repo). Name = name of user. Pubkey = path t
 
 Add repo (copy and push). Name = name of repo. Path = path to repo files
 
-### ~~grant "repo" "user" "perm"~~
+### grant "repo" "user" "perm"
 
 Grant some rights for user at specified repo. Repo = name of repo. User = name of user. Perm = RW|R
 

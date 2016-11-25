@@ -2,7 +2,7 @@
 #
 # Install gitolite for chosen user
 #
-# @1 = username
+# $1 = username
 #
 . $(dirname $0)/_helper #import functions
 
@@ -17,6 +17,7 @@ echo "git_user=\"$user_git_name\"" > "$(dirname $0)/../gbc.cfg"
 #check os
 if [ ! "${OS}" == "centos" ] && [ ! "${OS}" == "ubuntu"  ] ; then 
 	echo "Untested OS '$OS' - please fix it at sources if you really want to proceed (I guess no)"
+	exit -1
 else 
 	echo "OS '$OS' is ok"
 fi

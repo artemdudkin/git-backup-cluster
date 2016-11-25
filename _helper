@@ -12,13 +12,10 @@ function read_prop_from_file_or_string() {
 	if [ -f "$1" ] ; then
 		while IFS="$delimiter" read -r key value
 		do
-#printf "\nkey=='$key' value=='$value'\n"
 			key=$(  echo "$key"   | sed -e 's/^[[:space:]]*//' | sed -e 's/[[:space:]]*$//')
 			value=$(echo "$value" | sed -e 's/^[[:space:]]*//' | sed -e 's/[[:space:]]*$//')
 			value=$(echo "$value" | tr '[:upper:]' '[:lower:]')
-#printf "\nkey=='$key' 2='$2' 1='$1' 3='$3'\n"
 			if [ ! -z "${key}" ] && [ "${key}" == "$2" ] ; then 
-#printf "found"
 				ret=$(echo "$value" | sed -e 's/^"*//' | sed -e 's/"*$//')
 			fi
 		done < "$1"
@@ -50,14 +47,12 @@ function user_exists_or_homedir_exists_will_cause_exit() {
 
 	#if user exists then stop
 	if [ $(user_exists "$user_name") -eq 1 ]; then
-		echo "ERROR: Cannot proceed as user '$user_name' exists already - please remove it and start again"; 
-		exit -1
+		echo "ERROR: Cannot proceed as user '$user_name' exists already - please remove it and start again"; exit -1
 	fi
 
 	#if homedir folder exists then stop
 	if [ -d "/home/$user_name" ]; then
-		echo "ERROR: Cannot proceed as folder '/home/$user_name' exists already - please remove it and start again"; 
-		exit -1
+		echo "ERROR: Cannot proceed as folder '/home/$user_name' exists already - please remove it and start again"; exit -1
 	fi
 }
 #@1 = username
@@ -84,7 +79,7 @@ function user_create() {
 #@1 = get user name (optional)
 #@echo get user name
 function get_git_user_name(){
-	git_user=$1
+	local git_user=$1
 	if [ -z $git_user ] && [ -e "$(dirname $0)/../gbc.cfg" ]; then 
 		git_user=$(read_prop_from_file_or_string "$(dirname $0)/../gbc.cfg" "git_user")
 	fi

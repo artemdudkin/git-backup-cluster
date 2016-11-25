@@ -1,0 +1,83 @@
+#!/bin/bash
+#
+# Add or change permissions for user
+#
+# $1 = repo name
+# $2 = user name
+# $3 = user permissions (RW|R)
+#
+. $(dirname $0)/_helper #import functions
+
+repo=$1 
+user=$2 
+perm=$3 
+
+#check input params
+if [ -z $repo ] || [ -z $user ] || [ -z $perm ]; then printf "\n  Usage: $0 gitolite grant <repo> <user> <perm>\n\n"; exit -1; fi
+if [ "$perm" != "RW" ] && [ "$perm" != "R" ]; then echo "ERROR: perm should be RW or R"; exit -1; fi
+
+#get git user name
+git_user=$(get_git_user_name)
+git_user_admin="$git_user-admin"
+git_user_admin_home_dir=$(eval echo "~$git_user_admin")
+if [ -z "${git_user// }" ]; then echo "ERROR: Cannot find git user name - there is no gbc.cfg, maybe"; exit -1; fi
+path="$git_user_admin_home_dir/gitolite-admin/conf/gitolite.conf"
+
+#parse and change gitolite conf gile
+file=""
+current_repo=""
+changed=0
+while IFS='' read -r line 
+do
+	l=$(trim "$line")
+	
+	#empty string
+	if [ ! -n "$l" ]; then 
+		if [ "$current_repo" == $repo ] && [ $changed -eq 0 ]; then
+			#create new rule if there is no rule for this user
+			file=$(printf "$file\n    $perm = $user")
+		fi
+		current_repo="";
+		file=$(printf "$file\n ")
+	else
+	#repo string
+		if [[ "$l" == repo* ]]; then
+			current_repo=$(trim "${l//repo/}")
+			file=$(printf "$file\n$line")
+		else
+	#group string | deny perm string
+			if [[ "$l" == @* ]] || [[ "$l" == -* ]]; then
+				#file="${file}\n$line"	
+				file=$(printf "$file\n$line")
+			else 
+	#perm string -> change if it is specified user and specified repo 
+				if [[ "$l" == *=* ]]; then
+					current_user=$(trim $(cut -f2 -d= <<<"$l"))
+					if [ "$current_user" == $user ] && [ "$current_repo" == $repo ]; then
+						file=$(printf "$file\n    $perm = $user")
+						changed=1
+					else
+						file=$(printf "$file\n$line")
+					fi
+				fi
+			fi
+		fi
+	fi
+done < "$path"
+
+printf "${file:1}\n" > ./.tmp
+cat ./.tmp
+cp -r ./.tmp "$path"
+chown "$git_user_admin":"$git_user_admin" "$path"
+rm -f ./.tmp
+
+#push to gitolite-admin repo @ admin user
+sudo -u $git_user_admin -H sh << EOF
+	cd $git_user_admin_home_dir/gitolite-admin
+	
+	git add -A .
+	git commit -m "grant $perm for user $user at repo $repo"
+	git push origin master
+EOF
+
+exit

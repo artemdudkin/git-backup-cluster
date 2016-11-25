@@ -32,11 +32,19 @@ if [ "$command" == "gitolite" ] && [ $2 == "add" ] && [ $3 == "user" ]; then
 	exit
 fi
 
+if [ "$command" == "gitolite" ] && [ $2 == "grant" ]; then
+	repo=$3
+	user=$4
+	perm=$5
+	~/git-backup-cluster/_gitolite_grant $repo $user $perm
+	exit
+fi
+
 #fallback messages
 if [ -z "$command" ]; then 
 	printf "\n  Usage: $0 <command> [<param1>] [<param2>] ...\n\n" 
 	exit 
 fi
-printf "\n  ERROR: Unknown command '$1'\n\n"
+printf "\n  ERROR: Unknown command '$*'\n\n"
 exit
 

@@ -1,5 +1,17 @@
 #!/bin/bash
 
+#@1 = string
+#@echo trimed string
+function trim() { 
+	echo "$1" | sed -e 's/^[[:space:]]*//' | sed -e 's/[[:space:]]*$//';
+}
+
+#@1 = string
+#@echo lowercase string
+function toLowerCase() { 
+	echo "$1" | tr '[:upper:]' '[:lower:]'
+}
+
 #Reads props form file where lines looks like ID="centos"
 #@1 = filepath
 #@2 = prop name
@@ -12,9 +24,8 @@ function read_prop_from_file_or_string() {
 	if [ -f "$1" ] ; then
 		while IFS="$delimiter" read -r key value
 		do
-			key=$(  echo "$key"   | sed -e 's/^[[:space:]]*//' | sed -e 's/[[:space:]]*$//')
-			value=$(echo "$value" | sed -e 's/^[[:space:]]*//' | sed -e 's/[[:space:]]*$//')
-			value=$(echo "$value" | tr '[:upper:]' '[:lower:]')
+			key=$(trim "$key")
+			value=$(toLowerCase $(trim "$value"))
 			if [ ! -z "${key}" ] && [ "${key}" == "$2" ] ; then 
 				ret=$(echo "$value" | sed -e 's/^"*//' | sed -e 's/"*$//')
 			fi
@@ -22,6 +33,7 @@ function read_prop_from_file_or_string() {
 	fi
 	echo $ret
 }
+
 #@echo operation system id
 function get_os_id() { 
 	local id=$(read_prop_from_file_or_string "/etc/os-release" "ID")
@@ -32,6 +44,7 @@ function get_os_id() {
 	fi
 	echo $id
 }
+
 #@1 = user name
 #@echo 0/1
 function user_exists() {
@@ -39,6 +52,7 @@ function user_exists() {
 	getent passwd $1 >/dev/null 2>&1 && ret=1
 	echo $ret;
 }
+
 #@1 = username
 #exit on error
 function user_exists_or_homedir_exists_will_cause_exit() {
@@ -55,6 +69,7 @@ function user_exists_or_homedir_exists_will_cause_exit() {
 		echo "ERROR: Cannot proceed as folder '/home/$user_name' exists already - please remove it and start again"; exit -1
 	fi
 }
+
 #@1 = username
 #exit on error
 function user_create() {
@@ -76,6 +91,7 @@ function user_create() {
 		echo "User '$user_name' created"
 	fi
 }
+
 #@1 = get user name (optional)
 #@echo get user name
 function get_git_user_name(){

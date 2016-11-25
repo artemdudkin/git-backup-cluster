@@ -42,7 +42,7 @@ Grant some rights for user at specified repo. Repo = name of repo. User = name o
 
 ## Master Commands 
 
-### install
+### init
 
 Init of master node
 
@@ -56,7 +56,7 @@ Existing user becomes node - that means user grant R access to repo at cluster (
 
 ## Slave Commands 
 
-### install "ip"
+### init "ip"
 
 Init of slave node. IP = ip of master.
 

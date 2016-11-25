@@ -27,13 +27,13 @@ gbc gitolite|master|slave <command> <params>
 
 Create git user named "username" (i.e. user to store repos), create git-admin user (named "username-admin") and install gitolite. You should use this username it 'git clone' command from this host (i.e. git clone username@....).
 
-### add repo "name" "path"
-
-Add repo (copy and push). Name = name of repo. Path = path to repo files
-
 ### add user "name" "pubkey" 
 
 Add user (with no permissions to any repo). Name = name of user. Pubkey = path to public key of user.
+
+### add repo "name" "path"
+
+Add repo (copy and push). Name = name of repo. Path = path to repo files
 
 ### grant "repo" "user" "perm" 
 

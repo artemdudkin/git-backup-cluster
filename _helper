@@ -25,7 +25,8 @@ function read_prop_from_file_or_string() {
 		while IFS="$delimiter" read -r key value
 		do
 			key=$(trim "$key")
-			value=$(toLowerCase $(trim "$value"))
+			value=$(trim "$value")
+			value=$(toLowerCase "$value")
 			if [ ! -z "${key}" ] && [ "${key}" == "$2" ] ; then 
 				ret=$(echo "$value" | sed -e 's/^"*//' | sed -e 's/"*$//')
 			fi

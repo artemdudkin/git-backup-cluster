@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Add or change permissions for user
+# Add or change permissions for user (creates repo if it does not exists)
 #
 # $1 = repo name
 # $2 = user name
@@ -11,6 +11,7 @@
 repo=$1 
 user=$2 
 perm=$3 
+#path=$4 
 
 #check input params
 if [ -z $repo ] || [ -z $user ] || [ -z $perm ]; then printf "\n  Usage: $0 gitolite grant <repo> <user> <perm>\n\n"; exit -1; fi
@@ -24,40 +25,43 @@ if [ -z "${git_user// }" ]; then echo "ERROR: Cannot find git user name - there 
 path="$git_user_admin_home_dir/gitolite-admin/conf/gitolite.conf"
 
 #parse and change gitolite conf gile
-file=""
+file="  "
 current_repo=""
-changed=0
-while IFS='' read -r line 
+user_changed=0
+while IFS='' read -r line || [ -n "$line" ]
 do
-	l=$(trim "$line")
+	l=$(cut -f1 -d# <<<"$line") #remove comments
+	l=$(trim "$l")              #trim string
 	
 	#empty string
 	if [ ! -n "$l" ]; then 
-		if [ "$current_repo" == $repo ] && [ $changed -eq 0 ]; then
-			#create new rule if there is no rule for this user
-			file=$(printf "$file\n    $perm = $user")
-		fi
-		current_repo="";
-		file=$(printf "$file\n ")
+		file=$(echo "${file::-2}" && echo "$line" && echo " ") #this madness is just to preserve empty strings
 	else
 	#repo string
 		if [[ "$l" == repo* ]]; then
+			if [ "$current_repo" == $repo ] && [ $user_changed -eq 0 ]; then
+#				file="${file::-3}"
+#				if [ "$(echo -n $str | tail -c 1)" == "\n"]; then file=$(echo "${file::-1}"); fi
+#				file=$(echo "${file	}" && echo "    $perm = $user" && echo && echo " ")
+				file=$(echo "${file::-2}" && echo "    $perm = $user" && echo " ")
+				user_changed=1
+			fi
 			current_repo=$(trim "${l//repo/}")
-			file=$(printf "$file\n$line")
+			file=$(echo "${file::-2}" && echo "$line" && echo " ")
 		else
 	#group string | deny perm string
 			if [[ "$l" == @* ]] || [[ "$l" == -* ]]; then
 				#file="${file}\n$line"	
-				file=$(printf "$file\n$line")
+				file=$(echo "${file::-2}" && echo "$line" && echo " ")
 			else 
 	#perm string -> change if it is specified user and specified repo 
 				if [[ "$l" == *=* ]]; then
 					current_user=$(trim $(cut -f2 -d= <<<"$l"))
 					if [ "$current_user" == $user ] && [ "$current_repo" == $repo ]; then
-						file=$(printf "$file\n    $perm = $user")
-						changed=1
+						file=$(echo "${file::-2}" && echo "    $perm = $user" && echo " ")
+						user_changed=1
 					else
-						file=$(printf "$file\n$line")
+						file=$(echo "${file::-2}" && echo "$line" && echo " ")
 					fi
 				fi
 			fi
@@ -65,7 +69,17 @@ do
 	fi
 done < "$path"
 
-printf "${file:1}\n" > ./.tmp
+#create repo/rule pair (will creates repo if it does not exists)
+if [ $user_changed -eq 0 ]; then
+	if [ "$current_repo" != $repo ]; then
+		file=$(echo "${file::-2}" && echo && echo "repo $repo" && echo "    $perm = $user" && echo " ")
+	else 
+		file=$(echo "${file::-2}" && echo "    $perm = $user" && echo " ")
+	fi
+fi
+
+#save to file
+echo "${file:1:-2}" > ./.tmp
 cat ./.tmp
 cp -r ./.tmp "$path"
 chown "$git_user_admin":"$git_user_admin" "$path"

@@ -25,15 +25,14 @@ sudo -u $user_admin_name -H sh << EOF
 	git clone $user_git_name@localhost:git-backup-cluster
 EOF
 
-echo 'git-backup-cluster' > $(dirname $0)/cfg/repos
-
 cp -R $(dirname $0)/* "$user_admin_dir/git-backup-cluster"
+echo 'git-backup-cluster' > "$user_admin_dir/git-backup-cluster/cfg/repos"
 chown -R "$user_admin_name:$user_admin_name" "$user_admin_dir"
 
 #clone gitolite-admin repo @ admin user
 sudo -u $user_admin_name -H sh << EOF
 	cd $user_admin_dir/git-backup-cluster
-
+	
 	git add -A .
 	git commit -m "initial commit"
 	git push origin master

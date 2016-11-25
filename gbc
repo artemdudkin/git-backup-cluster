@@ -12,37 +12,25 @@ fi
 if [ "$command" == "install" ]; then
 	#create symlink to this file from ~/bin
 	mkdir -p ~/bin
+	echo 'export PATH="$HOME/bin:$PATH' >> ~/.bashrc #to allow ubuntu run scripts from ~/bin
 	ln -s "$(realpath $0)" ~/bin/gbc
 	exit
 fi
 
-if [ "$command" == "master" ]; then
-	user=$2; if [ -z $user ]; then user="git"; fi
-
+if [ "$command" == "gitolite" ] && [ $2 == "install" ]; then
+	user=$3; if [ -z $user ]; then user="git"; fi
+	
 	~/git-backup-cluster/_install_gitolite $user
 	if [ $? != 0 ] ; then exit; fi
 	~/git-backup-cluster/_clone_self $user
 	exit
 fi
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-if [ -z "$command" ]; then
-	printf "\n  Usage: $0 <command> [<param1>] [<param2>] ...\n\n"
-	exit
+#fallback messages
+if [ -z "$command" ]; then 
+	printf "\n  Usage: $0 <command> [<param1>] [<param2>] ...\n\n" 
+	exit 
 fi
-
 printf "\n  ERROR: Unknown command '$1'\n\n"
 exit
 

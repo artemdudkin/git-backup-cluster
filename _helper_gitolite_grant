@@ -19,8 +19,8 @@ function gitolite_grant {
 	if [ -z $repo ] || [ -z $user ] || [ -z $perm ] || [ -z $path ]; then printf "ERR_PARAMS"; exit; fi
 	if [ "$perm" != "RW" ] && [ "$perm" != "R" ]; then echo "ERR_PERM"; exit; fi
 	if [ ! -e $path ]; then echo "ERR_NO_FILE"; exit; fi
-	#deny user <git-user>-admin
-	#deny repo gitolite-admin
+	if [ "$repo" == "gitolite-admin" ]; then echo "ERR_ADMIN_REPO"; exit; fi
+	if [ "$user" == "git-admin" ]; then echo "ERR_ADMIN_USER"; exit; fi
 
 	#parse and change gitolite conf gile
 	file="./.tmp_gitolite_cfg"
@@ -82,5 +82,3 @@ function gitolite_grant {
 	cat "$file"
 	rm -f "$file"
 }
-
-#gitolite_grant $1 $2 $3 $4

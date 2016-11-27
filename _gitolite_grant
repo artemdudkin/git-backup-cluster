@@ -27,6 +27,8 @@ if [[ "$cfg" == ERR* ]]; then
 	if [ "$cfg" == "ERR_PARAMS" ]; then printf "\n\n\tUsage: $0 gitolite grant <repo> <user> <perm>\n\n"; exit -1; fi
 	if [ "$cfg" == "ERR_PERM" ]; then echo "ERROR: Permission should be RW or R"; exit -1; fi
 	if [ "$cfg" == "ERR_NO_FILE" ]; then echo "ERROR: Cannot find gitolite config file"; exit -1; fi
+	if [ "$cfg" == "ERR_ADMIN_REPO" ]; then echo "ERROR: Cannot change admin user perms (please do not shoot yourself in the feet)"; exit -1; fi
+	if [ "$cfg" == "ERR_ADMIN_USER" ]; then echo "ERROR: Cannot change admin repo perms (please do not shoot yourself in the feet)"; exit -1; fi
 	#fallback error message
 	echo "$cfg"; exit -1;
 fi

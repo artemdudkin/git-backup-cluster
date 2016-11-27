@@ -6,92 +6,35 @@
 # $2 = user name
 # $3 = user permissions (RW|R)
 #
-. $(dirname $0)/_helper #import functions
+. $(dirname $0)/_helper                #import functions
+. $(dirname $0)/_helper_gitolite       #import functions
+. $(dirname $0)/_helper_gitolite_grant #import functions
+repo=$1
+user=$2
+perm=$3
 
-repo=$1 
-user=$2 
-perm=$3 
-#path=$4 
-
-#check input params
-if [ -z $repo ] || [ -z $user ] || [ -z $perm ]; then printf "\n  Usage: $0 gitolite grant <repo> <user> <perm>\n\n"; exit -1; fi
-if [ "$perm" != "RW" ] && [ "$perm" != "R" ]; then echo "ERROR: perm should be RW or R"; exit -1; fi
+git_check_user_name #check if we have git user name (i.e. config file)
 
 #get git user name
 git_user=$(get_git_user_name)
 git_user_admin="$git_user-admin"
-git_user_admin_home_dir=$(eval echo "~$git_user_admin")
-if [ -z "${git_user// }" ]; then echo "ERROR: Cannot find git user name - there is no gbc.cfg, maybe"; exit -1; fi
-path="$git_user_admin_home_dir/gitolite-admin/conf/gitolite.conf"
+git_user_admin_home=$(eval echo "~$git_user_admin")
+path="$git_user_admin_home/gitolite-admin/conf/gitolite.conf"
 
-#parse and change gitolite conf gile
-file="  "
-current_repo=""
-user_changed=0
-while IFS='' read -r line || [ -n "$line" ]
-do
-	l=$(cut -f1 -d# <<<"$line") #remove comments
-	l=$(trim "$l")              #trim string
-	
-	#empty string
-	if [ ! -n "$l" ]; then 
-		file=$(echo "${file::-2}" && echo "$line" && echo " ") #this madness is just to preserve empty strings
-	else
-	#repo string
-		if [[ "$l" == repo* ]]; then
-			if [ "$current_repo" == $repo ] && [ $user_changed -eq 0 ]; then
-#				file="${file::-3}"
-#				if [ "$(echo -n $str | tail -c 1)" == "\n"]; then file=$(echo "${file::-1}"); fi
-#				file=$(echo "${file	}" && echo "    $perm = $user" && echo && echo " ")
-				file=$(echo "${file::-2}" && echo "    $perm = $user" && echo " ")
-				user_changed=1
-			fi
-			current_repo=$(trim "${l//repo/}")
-			file=$(echo "${file::-2}" && echo "$line" && echo " ")
-		else
-	#group string | deny perm string
-			if [[ "$l" == @* ]] || [[ "$l" == -* ]]; then
-				#file="${file}\n$line"	
-				file=$(echo "${file::-2}" && echo "$line" && echo " ")
-			else 
-	#perm string -> change if it is specified user and specified repo 
-				if [[ "$l" == *=* ]]; then
-					current_user=$(trim $(cut -f2 -d= <<<"$l"))
-					if [ "$current_user" == $user ] && [ "$current_repo" == $repo ]; then
-						file=$(echo "${file::-2}" && echo "    $perm = $user" && echo " ")
-						user_changed=1
-					else
-						file=$(echo "${file::-2}" && echo "$line" && echo " ")
-					fi
-				fi
-			fi
-		fi
-	fi
-done < "$path"
+cfg=$(gitolite_grant $repo $user $perm $path)
 
-#create repo/rule pair (will creates repo if it does not exists)
-if [ $user_changed -eq 0 ]; then
-	if [ "$current_repo" != $repo ]; then
-		file=$(echo "${file::-2}" && echo && echo "repo $repo" && echo "    $perm = $user" && echo " ")
-	else 
-		file=$(echo "${file::-2}" && echo "    $perm = $user" && echo " ")
-	fi
+if [[ "$cfg" == ERR* ]]; then
+	if [ "$cfg" == "ERR_PARAMS" ]; then printf "\n\n\tUsage: $0 gitolite grant <repo> <user> <perm>\n\n"; exit -1; fi
+	if [ "$cfg" == "ERR_PERM" ]; then echo "ERROR: Permission should be RW or R"; exit -1; fi
+	if [ "$cfg" == "ERR_NO_FILE" ]; then echo "ERROR: Cannot find gitolite config file"; exit -1; fi
+	#fallback error message
+	echo "$cfg"; exit -1;
 fi
 
-#save to file
-echo "${file:1:-2}" > ./.tmp
-cat ./.tmp
-cp -r ./.tmp "$path"
+echo "$cfg"
+echo "$cfg" > "$path"
 chown "$git_user_admin":"$git_user_admin" "$path"
-rm -f ./.tmp
 
-#push to gitolite-admin repo @ admin user
-sudo -u $git_user_admin -H sh << EOF
-	cd $git_user_admin_home_dir/gitolite-admin
-	
-	git add -A .
-	git commit -m "grant $perm for user $user at repo $repo"
-	git push origin master
-EOF
+gitolite_save "grant $perm for user $user at repo $repo"
 
 exit

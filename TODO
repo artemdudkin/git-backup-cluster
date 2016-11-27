@@ -1,6 +1,6 @@
 ----. init gitolite       @ master
 2. create empty repo   @ master
-3. add gitolite user   @ master
+----3. add gitolite user   @ master
 4. mark repo to backup @ master
 
 5. add slave pub key   @ master

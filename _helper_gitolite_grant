@@ -1,0 +1,86 @@
+#!/bin/bash
+#
+# Add or change permissions for user (creates repo if it does not exists)
+#
+# $1 = repo name
+# $2 = user name
+# $3 = user permissions (RW|R)
+# $4 = gitolite config path
+#
+. $(dirname $0)/_helper #import functions
+
+function gitolite_grant {
+#echo "1==$1 2==$2 3==$3 4==$4"
+	repo=$1 
+	user=$2 
+	perm=$3 
+	path=$4 
+	#check input params
+	if [ -z $repo ] || [ -z $user ] || [ -z $perm ] || [ -z $path ]; then printf "ERR_PARAMS"; exit; fi
+	if [ "$perm" != "RW" ] && [ "$perm" != "R" ]; then echo "ERR_PERM"; exit; fi
+	if [ ! -e $path ]; then echo "ERR_NO_FILE"; exit; fi
+	#deny user <git-user>-admin
+	#deny repo gitolite-admin
+
+	#parse and change gitolite conf gile
+	file="./.tmp_gitolite_cfg"
+	printf "" > $file
+	current_repo=""
+	user_changed=0
+	while IFS='' read -r line || [ -n "$line" ]
+	do
+		l=$(cut -f1 -d# <<<"$line") #remove comments
+		l=$(trim "$l")              #trim string
+	
+		#empty string
+		if [ ! -n "$l" ]; then 
+			printf "$line\n" >> $file
+		else
+		#repo string
+			if [[ "$l" == repo* ]]; then
+				if [ "$current_repo" == $repo ] && [ $user_changed -eq 0 ]; then
+					delete_trailing_blank_lines_at_end_of_file $file
+					printf "    $perm = $user\n\n" >> $file
+					user_changed=1
+				fi
+				current_repo=$(trim "${l//repo/}")
+				printf "$line\n" >> $file
+			else
+		#group string | deny perm string
+				if [[ "$l" == @* ]] || [[ "$l" == -* ]]; then
+					printf "$line\n" >> $file
+				else 
+		#perm string -> change if it is specified user and specified repo 
+					if [[ "$l" == *=* ]]; then
+						current_user=$(trim $(cut -f2 -d= <<<"$l"))
+						if [ "$current_user" == $user ] && [ "$current_repo" == $repo ]; then
+							delete_trailing_blank_lines_at_end_of_file $file
+							printf "    $perm = $user\n" >> $file
+							user_changed=1
+						else
+							printf "$line\n" >> $file
+						fi
+					fi
+				fi
+			fi
+		fi
+	done < "$path"
+		
+	#create repo/rule pair (will creates repo if it does not exists)
+	if [ $user_changed -eq 0 ]; then
+		if [ "$current_repo" != $repo ]; then
+			delete_trailing_blank_lines_at_end_of_file $file
+			printf "\nrepo $repo\n" >> $file
+			printf "    $perm = $user\n" >> $file
+		else 
+			delete_trailing_blank_lines_at_end_of_file $file
+			printf "$line\n" >> $file
+		fi
+	fi
+		
+	#save to file
+	cat "$file"
+	rm -f "$file"
+}
+
+#gitolite_grant $1 $2 $3 $4

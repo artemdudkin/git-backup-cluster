@@ -5,7 +5,8 @@
 # $1 = name of user
 # $2 = path to public key of user.
 #
-. $(dirname $0)/_helper #import functions
+. $(dirname $0)/_helper          #import functions
+. $(dirname $0)/_helper_gitolite #import functions
 
 user=$1 
 keypath=$2 
@@ -16,12 +17,13 @@ if [ ! -e $keypath ]; then echo "ERROR: file '$keypath' does not exists"; exit; 
 ssh-keygen -l -f $keypath > /dev/null
 if [ ! $? -eq 0 ]; then echo "ERROR: file '$keypath' is not a public key file"; exit; fi
 
-
 #get git user name
 git_user=$(get_git_user_name)
 git_user_admin="$git_user-admin"
 git_user_admin_home_dir=$(eval echo "~$git_user_admin")
-if [ -z "${git_user// }" ]; then echo "ERROR: Cannot find git user name - there is no gbc.cfg, maybe"; exit -1; fi
+
+#check if we have git user name (i.e. config file)
+git_check_user_name
 
 #check if user unique
 users=$(ls "$git_user_admin_home_dir/gitolite-admin/keydir/")
@@ -30,13 +32,7 @@ if [[ $users == *$user* ]]; then echo "ERROR: User '$user' already exists"; exit
 
 #copy keyfile to gitolite
 cp "$keypath" "$git_user_admin_home_dir/gitolite-admin/keydir/$user.pub"
+#ajust rights
 chown "$git_user_admin":"$git_user_admin" "$git_user_admin_home_dir/gitolite-admin/keydir/$user.pub"
 
-#push to gitolite-admin repo @ admin user
-sudo -u $git_user_admin -H sh << EOF
-	cd $git_user_admin_home_dir/gitolite-admin
-	
-	git add -A .
-	git commit -m "add user $user"
-	git push origin master
-EOF
+gitolite_save "add user $user"

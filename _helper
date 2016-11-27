@@ -46,59 +46,10 @@ function get_os_id() {
 	echo $id
 }
 
-#@1 = user name
-#@echo 0/1
-function user_exists() {
-	local ret=0
-	getent passwd $1 >/dev/null 2>&1 && ret=1
-	echo $ret;
-}
-
-#@1 = username
-#exit on error
-function user_exists_or_homedir_exists_will_cause_exit() {
-	local user_name=$1
-	if [ -z $user_name ]; then echo "ERROR: empty user @ check_user_exists_or_homedir_exists"; exit -1; fi
-
-	#if user exists then stop
-	if [ $(user_exists "$user_name") -eq 1 ]; then
-		echo "ERROR: Cannot proceed as user '$user_name' exists already - please remove it and start again"; exit -1
-	fi
-
-	#if homedir folder exists then stop
-	if [ -d "/home/$user_name" ]; then
-		echo "ERROR: Cannot proceed as folder '/home/$user_name' exists already - please remove it and start again"; exit -1
-	fi
-}
-
-#@1 = username
-#exit on error
-function user_create() {
-	local user_name=$1
-	if [ -z $user_name ]; then echo "ERROR: empty user @ user_create"; exit -1; fi
-
-	#create new user 
-	if [ $OS == "centos" ]; then
-		sudo adduser $user_name
-	else 
-		sudo adduser --disabled-password --gecos "" $user_name
-	fi
-	
-	#check if user really created 
-	if [ ! $(user_exists "$user_name") -eq 1 ]; then
-		echo "ERROR: Cannot create user '$user_name'"; 
-		exit -1
-	else
-		echo "User '$user_name' created"
-	fi
-}
-
-#@1 = get user name (optional)
-#@echo get user name
-function get_git_user_name(){
-	local git_user=$1
-	if [ -z $git_user ] && [ -e "$(dirname $0)/../gbc.cfg" ]; then 
-		git_user=$(read_prop_from_file_or_string "$(dirname $0)/../gbc.cfg" "git_user")
-	fi
-	echo "$git_user"
+#@1 = filepath
+#@changes file
+function delete_trailing_blank_lines_at_end_of_file { 
+	local newfile="./.tmp_del"
+	sed -e :a -e '/^\n*$/{$d;N;};/\n$/ba' $1 > $newfile
+	mv $newfile $1
 }

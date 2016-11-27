@@ -4,7 +4,8 @@
 #
 # $1 = username
 #
-. $(dirname $0)/_helper #import functions
+. $(dirname $0)/_helper      #import functions
+. $(dirname $0)/_helper_user #import functions
 
 
 OS=$(get_os_id)

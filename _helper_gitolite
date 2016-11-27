@@ -1,0 +1,41 @@
+#!/bin/bash
+
+#@1 = get user name (optional)
+#@echo get user name
+function get_git_user_name {
+	local git_user=$1
+	if [ -z $git_user ] && [ -e "$(dirname $0)/../gbc.cfg" ]; then 
+		git_user=$(read_prop_from_file_or_string "$(dirname $0)/../gbc.cfg" "git_user")
+	fi
+	echo "$git_user"
+}
+
+#@exit on error
+function git_check_user_name {
+	#get git user name
+	git_user=$(get_git_user_name)
+	if [ -z "${git_user// }" ]; then echo "ERROR: Cannot find git user name - there is no gbc.cfg, maybe"; exit -1; fi
+}	
+
+#@1 = comment for commit
+function gitolite_save {
+	local comment=$1
+	if [ -z "$comment" ]; then echo "ERROR: you should add comment to commit"; exit -1; fi
+
+	git_check_user_name
+
+	#get git user name
+	git_user=$(get_git_user_name)
+	git_user_admin="$git_user-admin"
+	git_user_admin_home=$(eval echo "~$git_user_admin")
+	
+	#push to gitolite-admin repo @ admin user
+	sudo -u $git_user_admin -H sh << EOF
+		cd $git_user_admin_home/gitolite-admin
+		
+		git add -A .
+		git commit -m "$comment"
+		git push origin master
+EOF
+}
+

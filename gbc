@@ -2,22 +2,20 @@
 
 command=$1
 
-if [ "$command" == "clear" ]; then
+if [ "$command" == "clear" ]; then #Removes ^M at files from windows
 	if [ -z $2 ]; then printf "Removes ^M at files from windows\n\n  Usage: $0 clear <filename>\n\n"; exit; fi
-	#removes ^M at files from windows
 	sed -i -e 's/\r$//' "$2"
 	exit
 fi
 
-if [ "$command" == "install" ]; then
-	#create symlink to this file from ~/bin
+if [ "$command" == "install" ]; then #create symlink to this file from ~/bin
 	mkdir -p ~/bin
 	echo 'export PATH="$HOME/bin:$PATH' >> ~/.bashrc #to allow ubuntu run scripts from ~/bin
 	ln -s "$(realpath $0)" ~/bin/gbc
 	exit
 fi
 
-if [ "$command" == "gitolite" ] && [ $2 == "install" ]; then
+if [ "$command" == "gitolite" ] && [ $2 == "install" ]; then #create git and git-admin users, clone gitolite, clone git-backup-cluster
 	git_user=$3; if [ -z $git_user ]; then git_user="git"; fi
 	~/git-backup-cluster/_gitolite_install $git_user
 	if [ $? != 0 ] ; then exit; fi
@@ -25,17 +23,14 @@ if [ "$command" == "gitolite" ] && [ $2 == "install" ]; then
 	exit
 fi
 
-if [ "$command" == "gitolite" ] && [ $2 == "add" ] && [ $3 == "user" ]; then
-	user=$4
-	keypath=$5
+if [ "$command" == "gitolite" ] && [ $2 == "add" ] && [ $3 == "user" ]; then 
+	user=$4; keypath=$5;
 	~/git-backup-cluster/_gitolite_add_user $user $keypath
 	exit
 fi
 
 if [ "$command" == "gitolite" ] && [ $2 == "grant" ]; then
-	repo=$3
-	user=$4
-	perm=$5
+	repo=$3; user=$4; perm=$5;
 	~/git-backup-cluster/_gitolite_grant $repo $user $perm
 	exit
 fi

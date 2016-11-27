@@ -2,12 +2,11 @@
 
 Backups selected git repos from master to several slaves by schedule (gitolite used).
 
-_I have some set of git repos with my private projects. I changed VPS providers several time and it was a pain to move my repos from one VPS to another. And one time I lost my central git host when I forgot to make a payment for VPS._
+_I have some set of git repos with my private projects. I changed VPS providers several times and it was a pain to move my repos from one VPS to another. And one time I lost my central git host when I forgot to make a payment for VPS._
 
-_Now I have several chip VPS with backup of my repos, and I can add new slave just in one minute. Wow!_
+_Now I have several cheap VPS with backup of my repos, and I can add new slave just in one minute. Wow!_
 
 ***!!!Under construction!!!***
-
 
 ## Instalation
 

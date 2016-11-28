@@ -64,6 +64,8 @@ EOF
 
 #clone gitolite-admin repo @ admin user
 sudo -u $user_admin_name -H sh << EOF
+	ssh-keyscan localhost > ~/.ssh/known_hosts #add localhost to known_hosts to prevent interactive warning
+
 	cd $user_admin_dir
 	git clone $user_git_name@localhost:gitolite-admin
 EOF

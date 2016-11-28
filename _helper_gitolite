@@ -12,8 +12,7 @@ function get_git_user_name {
 
 #@exit on error
 function git_check_user_name {
-	#get git user name
-	git_user=$(get_git_user_name)
+	local git_user=$(get_git_user_name)
 	if [ -z "${git_user// }" ]; then echo "ERROR: Cannot find git user name - there is no gbc.cfg, maybe"; exit -1; fi
 }	
 
@@ -25,9 +24,9 @@ function gitolite_save {
 	git_check_user_name
 
 	#get git user name
-	git_user=$(get_git_user_name)
-	git_user_admin="$git_user-admin"
-	git_user_admin_home=$(eval echo "~$git_user_admin")
+	local git_user=$(get_git_user_name)
+	local git_user_admin="$git_user-admin"
+	local git_user_admin_home=$(eval echo "~$git_user_admin")
 	
 	#push to gitolite-admin repo @ admin user
 	sudo -u $git_user_admin -H sh << EOF

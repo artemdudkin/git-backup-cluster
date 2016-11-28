@@ -10,11 +10,10 @@
 . $(dirname $0)/_helper #import functions
 
 function gitolite_grant {
-#echo "1==$1 2==$2 3==$3 4==$4"
-	repo=$1 
-	user=$2 
-	perm=$3 
-	path=$4 
+	local repo=$1 
+	local user=$2 
+	local perm=$3 
+	local path=$4 
 	#check input params
 	if [ -z $repo ] || [ -z $user ] || [ -z $perm ] || [ -z $path ]; then printf "ERR_PARAMS"; exit; fi
 	if [ "$perm" != "RW" ] && [ "$perm" != "R" ]; then echo "ERR_PERM"; exit; fi
@@ -23,13 +22,14 @@ function gitolite_grant {
 	if [ "$user" == "git-admin" ]; then echo "ERR_ADMIN_USER"; exit; fi
 
 	#parse and change gitolite conf gile
-	file="./.tmp_gitolite_cfg"
+	local file="./.tmp_gitolite_cfg"
 	printf "" > $file
-	current_repo=""
-	user_changed=0
+
+	local current_repo=""
+	local user_changed=0
 	while IFS='' read -r line || [ -n "$line" ]
 	do
-		l=$(cut -f1 -d# <<<"$line") #remove comments
+		local l=$(cut -f1 -d# <<<"$line") #remove comments
 		l=$(trim "$l")              #trim string
 	
 		#empty string

@@ -29,6 +29,14 @@ if [ "$command" == "gitolite" ] && [ $2 == "add" ] && [ $3 == "user" ]; then
 	exit
 fi
 
+if [ "$command" == "gitolite" ] && [ $2 == "add" ] && [ $3 == "repo" ]; then 
+	repo=$4; repopath=$5;
+#        export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
+#        bash -x ~/git-backup-cluster/_gitolite_add_repo $repo $repopath
+	~/git-backup-cluster/_gitolite_add_repo $repo $repopath
+	exit
+fi
+
 if [ "$command" == "gitolite" ] && [ $2 == "grant" ]; then
 	repo=$3; user=$4; perm=$5;
 	~/git-backup-cluster/_gitolite_grant $repo $user $perm

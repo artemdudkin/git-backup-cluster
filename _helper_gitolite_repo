@@ -1,0 +1,64 @@
+#!/bin/bash
+
+. $(dirname $0)/_helper_gitolite #import functions
+
+# Add repo to gitolite
+#
+# $1 = repo name
+# $2 = repo path
+# $3 = gitolite config path
+#
+function gitolite_add_repo {
+	local repo=$1 
+	local path=$2 
+	local cfg=$3 
+
+	#check input params
+	if [ -z $repo ] || [ -z $path ]; then printf "ERR_PARAMS"; exit; fi
+	if [ ! -e $cfg  ]; then echo "ERR_NO_FILE"; exit; fi
+	if [ ! -d $path ]; then echo "ERR_NO_FOLDER"; exit; fi
+	if [ "$repo" == "gitolite-admin" ]; then echo "ERR_ADMIN_REPO"; exit; fi
+
+	#check if repo already exists
+        #TODO
+
+	#add given repo 
+	local file="./.tmp_gitolite_cfg"
+	printf "" > $file
+
+	cat $cfg >> $file
+	printf "\nrepo $repo\n    RW = git-admin\n\n" >> $file
+
+	#save to file
+	cat "$file"
+	rm -f "$file"
+
+#	gitolite_save "add repo $repo"
+}
+
+
+# Add repo to gitolite
+#
+# $1 = form folder
+# $2 = to folder
+#
+function gitolite_copy_repo {
+	cd $git_user_admin_home/gitolite-admin
+	printf "\nrepo $repo\n    RW = git-admin\n\n" >> conf/gitolite.conf
+	chown -R "$git_user_admin:$git_user_admin" "$git_user_admin_home"
+	
+	gitolite_save "add repo $repo"
+	
+	gitolite_load $repo
+
+	#copy given repo 
+	cp -R $path/* "$git_user_admin_home/$repo"
+	chown -R "$git_user_admin:$git_user_admin" "$git_user_admin_home"
+
+	#save repo
+	gitolite_save "initial commit" $repo
+}
+
+
+#echo $(get_git_user_name)
+#gitolite_add_repo $1 $2

@@ -8,8 +8,6 @@ _I have some set of git repos with my private projects. I changed VPS providers 
 
 _Now I have several cheap VPS with backup of my repos, and I can add new slave just in one minute. Wow!_
 
-***!!!Under construction!!! ***
-
 ## Instalation
 
 - apt-get install git realpath (or 'yum install git realpath' at CentOs )

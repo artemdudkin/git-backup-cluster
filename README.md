@@ -1,5 +1,7 @@
 # git-backup-cluster
 
+![status not ready](https://img.shields.io/badge/status-not%20ready-red.svg)
+
 Backups selected git repos from master to several slaves by schedule (gitolite used).
 
 _I have some set of git repos with my private projects. I changed VPS providers several times and it was a pain to move my repos from one VPS to another. And one time I lost my central git host when I forgot to make a payment for VPS._
